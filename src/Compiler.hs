@@ -21,7 +21,7 @@ import Data.Tuple.Extra ((&&&))
 import Compiler.Types
 import qualified IIR as IIR
 --import IIR (IIR)
-import Types
+import Lang.Types (Binding, Expr(..))
 
 compileBinding :: Binding Expr -> Binding IIR.Function
 compileBinding = fmap (execCompile . compileFn)

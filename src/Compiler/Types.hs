@@ -6,7 +6,7 @@ import qualified Data.Map as Map
 
 import qualified IIR as IIR
 import IIR (IIR)
-import Types
+import Lang.Types (Ident)
 
 -- Compiler environment
 data Env = Env { vars :: Map Ident IIR.Arg

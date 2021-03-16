@@ -1,15 +1,21 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Parser (
   parseModule
 ) where
 
 import Control.Applicative ((<|>), many, some)
 import Data.Bifunctor (first)
-import Data.Text (Text, pack)
+import Data.Foldable (toList)
+import Data.List (intercalate)
+import Data.Text (Text, pack, unlines)
+import qualified Data.Text as Text
 import Text.Megaparsec (try)
 import qualified Text.Megaparsec as P
 import Text.Megaparsec.Char (char, digitChar, letterChar, space, space1)
 
-import Types (Binding(..), Expr(..), Ident(..))
+import Lang.Types (Binding(..), Expr(..), Ident(..))
+import Parser.Errors (Err, fmtParseError)
 
 parseExpr :: String -> Maybe Expr
 parseExpr src = P.parseMaybe expr src
@@ -20,9 +26,7 @@ parseExpr src = P.parseMaybe expr src
 --
 --   add2 = \x -> x + 2
 parseModule :: String -> Either Text [Binding Expr]
-parseModule src = first (pack . show) $ P.parse (many binding) "<no file>" src
-
-data Err = Err deriving (Show, Eq, Ord)
+parseModule src = first fmtParseError $ P.parse (many binding) "<no file>" src
 
 type Parser = P.Parsec Err String
 
