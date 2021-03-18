@@ -3,52 +3,37 @@
 
 module Main where
 
-import Control.Monad.Error (throwError, MonadError)
+import Control.Monad.Except (throwError, MonadError)
 import Data.Foldable (for_)
-import Data.Text (Text, unpack)
+import Data.Text (Text, unpack, pack)
+import Options.Applicative (execParser)
 
+import Args (Args(..), argParser)
 import CodeGen (printCode, runCodegen)
 import qualified IIR
-import IIR (Arg(..), Variable(..), BinOp(..))
 import qualified Compiler
 import Parser (parseModule)
-import Types (Binding(..), Expr)
-
-  {-
-main :: IO ()
-main = printCode $ runCodegen program
-  where program = [
-                    (IIR.Move (Variable 0) (Arg 0)),
-                    (IIR.Call (Variable 1) (Variable 2) [Var (Variable 0), Arg 1]),
-                    (IIR.Prim Add (Variable 3) (Var (Variable 1)) (Const 127)),
-                    (IIR.Return (Var (Variable 3)))
-                  ]
-                  -}
-
-{-
-main = do
-  filename <- arg
-  contents <- T.readFile filename
-  let output = compile contents
-  T.putStrLn output
--}
-
-{-
-   example prog:
-
-   add2 = \x -> x + 2
--}
+import Lang.Types (Binding(..), Expr)
 
 main :: IO ()
---main = print $ iir
-main = code
+main = parse
 
-code :: IO ()
-code = do
-  let program = either (error . unpack) id $ parseIIR "id = \\x -> (\\y -> y) x"
+loadSrcFile :: String -> IO Text
+loadSrcFile _ = return "file contents"
 
-  let fns = bindingValue <$> program
-  for_ fns printFn --(printCode . runCodegen)
+parse :: IO ()
+parse = do
+  args <- execParser argParser
+  src <- case args of
+    (Args (Just file) _ ) -> loadSrcFile file
+    (Args Nothing (Just src)) -> return (pack src)
+    (Args Nothing Nothing) -> error "Must specify either -f or -s"
+  --let program = either (error . unpack) id $ parseIIR src
+  case parseIIR src of
+    Left err -> putStrLn $ unpack err
+    Right program -> do
+      let fns = bindingValue <$> program
+      for_ fns printFn --(printCode . runCodegen)
 
 printFn :: IIR.Function -> IO ()
 printFn (IIR.Function insts protos) = do
@@ -78,7 +63,7 @@ parseIIR source = do
   -- Transmute the AST into our IIR (Imperative Intermediate Representation)
   return $ Compiler.compileBindings bindings
 
-  {-
+{-
 -- | Compile the Ithil source code `src` into Lua bytecode
 compile :: (MonadError Text m, MonadCompile m) => Text -> m Text
 compile src = do

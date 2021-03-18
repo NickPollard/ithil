@@ -6,19 +6,13 @@ module Parser (
 
 import Control.Applicative ((<|>), many, some)
 import Data.Bifunctor (first)
-import Data.Foldable (toList)
-import Data.List (intercalate)
-import Data.Text (Text, pack, unlines)
-import qualified Data.Text as Text
-import Text.Megaparsec (try)
+import Data.Text (Text, pack)
 import qualified Text.Megaparsec as P
+import Text.Megaparsec (try)
 import Text.Megaparsec.Char (char, digitChar, letterChar, space, space1)
 
 import Lang.Types (Binding(..), Expr(..), Ident(..))
 import Parser.Errors (Err, fmtParseError)
-
-parseExpr :: String -> Maybe Expr
-parseExpr src = P.parseMaybe expr src
 
 -- | A Module is a list of bindings
 -- ```

@@ -49,4 +49,27 @@ instance Show Expr where
 -- is a binding of (Lit 2) to the Ident "x"
 data Binding a = Binding { bindingName :: Ident
                          , bindingValue :: a
-                         } deriving (Functor, Applicative, Monad, Foldable, Traversable, Show)
+                         } deriving (Functor, Foldable, Traversable, Show)
+
+
+-- An encoding of a simple type system
+data Type = PrimType Prim
+          | FnType Type Type
+
+data Prim = IntPrim | BoolPrim
+
+  {-
+infer :: Expr -> Type
+infer (Lit _) = PrimType IntPrim
+infer (Var _) = ???
+infer (BuiltIn _) = PrimType IntPrim
+infer (App f x) = case (infer f, infer x) of
+                    ((FnType a b), c) if a == c -> a
+                    otherwise -> error "TypeError"
+infer (Lambda ident x) = do
+  a <- newVar ident
+  FnType a (infer x)
+
+check :: Expr -> Type -> Bool
+check expr typ = (infer expr == typ)
+-}
