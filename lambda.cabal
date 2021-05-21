@@ -27,6 +27,7 @@ library
                        Parser,
                        Parser.Errors,
                        Parser.Tokenizer,
+                       Parser.Types,
                        Types
   build-depends:       base >= 4.7 && < 5,
                        binary,

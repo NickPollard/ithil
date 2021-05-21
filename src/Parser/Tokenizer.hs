@@ -1,6 +1,7 @@
 {-# language OverloadedStrings #-}
 
 module Parser.Tokenizer (
+  Lexon(..),
   tokenize
 ) where
 
@@ -13,34 +14,61 @@ import Text.Megaparsec (try)
 import Text.Megaparsec.Char (char, digitChar, letterChar, space, space1, string)
 
 import Parser.Errors (Err)
+import Parser.Types (Lexon(..), TokenStream(..))
 
-data Token = Identifier Text
-           | Reserved Text
-           | Operator Text
+{-
+  TODO
 
+  Tokenizer should probably export a single-use tokenizer function
+  e.g.
+    tokenize :: String -> [Lexon]
+    * Can this fail? What does it mean to fail lexing?
+      If so, do we continue and try to parse at all?
+
+  We should also define token somewhere under the name `Token`. This could
+  clash with 'Token' as used in MegaParsec's `class TokenStream ..` so need
+  to define somewhere it can then be imported qualified.
+
+  Perhaps:
+    Parser.Tokenizer.Types (Token)
+    Parser.Tokenizer (.. define TokenStream impl ..
+    * Oh wait - that breaks the Orphan rule!
+    Or define w/ Tokenstream impl, but then alias and re-export somewhere?
+
+    Parser.Tokenizer { type Token = Parser.Tokenizer.Types.Token' }
+-}
+
+-- Token Parsers produce streams of `Parser.Types.Token`
 type Parser = P.Parsec Err String
 
-tokenize :: Parser [Token]
-tokenize = many token
+tokenize :: String -> TokenStream
+-- TODO: BAD
+tokenize src = TokenStream . maybe [] id $ P.parseMaybe tokenizer src
 
-token :: Parser Token
-token = ident <|> reserved <|> operator
+tokenizer :: Parser [Lexon]
+tokenizer = many token
 
-ident :: Parser Token
+token :: Parser Lexon
+token = ident <|> reserved <|> literal <|> operator
+
+ident :: Parser Lexon
 ident = Identifier . pack <$> some letterChar
 
-reserved :: Parser Token
+literal :: Parser Lexon
+literal = Literal . read <$> some digitChar
+
+reserved :: Parser Lexon
 reserved = Reserved . pack <$> asum (string <$> reserved_words)
   where reserved_words = [ "where", "case", "of", "let" ]
 
-operator :: Parser Token
+operator :: Parser Lexon
 operator = Operator . pack <$> ((return <$> chars) <|> strings)
   where chars :: Parser Char
         chars = asum $ char <$> operatorChars
         strings = asum $ string <$> operatorStrings
 
 operatorChars :: [Char]
-operatorChars = "\\*+="
+operatorChars = "\\*+=()"
 
 operatorStrings :: [String]
 operatorStrings = [ "->" ]

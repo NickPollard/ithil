@@ -13,6 +13,8 @@ import CodeGen (printCode, runCodegen)
 import qualified IIR
 import qualified Compiler
 import Parser (parseModule)
+import Parser.Tokenizer (tokenize)
+import Parser.Types (TokenStream(..))
 import Lang.Types (Binding(..), Expr)
 
 main :: IO ()
@@ -53,13 +55,15 @@ exampleProg = "\\x -> x + 2"
 
 parseExpr :: (MonadError Text m) => Text -> m [Binding Expr]
 parseExpr source = do
+  let tokenStream = tokenize (unpack source)
   -- Parse the source code into an AST
-  eitherToError $ parseModule (unpack source)
+  eitherToError $ parseModule tokenStream
 
 parseIIR :: (MonadError Text m) => Text -> m [Binding IIR.Function]
 parseIIR source = do
+  let tokenStream = tokenize (unpack source)
   -- Parse the source code into an AST
-  bindings <- eitherToError $ parseModule (unpack source)
+  bindings <- eitherToError $ parseModule tokenStream
   -- Transmute the AST into our IIR (Imperative Intermediate Representation)
   return $ Compiler.compileBindings bindings
 
