@@ -14,7 +14,7 @@ import qualified IIR
 import qualified Compiler
 import Parser (parseModule)
 import Parser.Tokenizer (tokenize)
-import Parser.Types (TokenStream(..))
+--import Parser.Types (TokenStream(..))
 import Lang.Types (Binding(..), Expr)
 
 main :: IO ()

@@ -6,12 +6,12 @@ module Parser.Tokenizer (
 ) where
 
 import Control.Applicative ((<|>), many, some)
-import Data.Bifunctor (first)
+--import Data.Bifunctor (first)
 import Data.Foldable (asum)
-import Data.Text (Text, pack)
+import Data.Text (pack)
 import qualified Text.Megaparsec as P
-import Text.Megaparsec (try)
-import Text.Megaparsec.Char (char, digitChar, letterChar, space, space1, string)
+--import Text.Megaparsec (try)
+import Text.Megaparsec.Char (char, digitChar, letterChar, string)
 
 import Parser.Errors (Err)
 import Parser.Types (Lexon(..), TokenStream(..))

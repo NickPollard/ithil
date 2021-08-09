@@ -9,6 +9,7 @@
 module Compiler (
   MonadCompile,
   compileBindings,
+  runCompile,
   execCompile
 ) where
 
@@ -144,3 +145,13 @@ compile (BuiltIn _) = error "Builtins are currently unimplemented"
         # begin fn f2
         return arg2
 -}
+
+{-
+  IIR needs to have a notion of function bindings - I need to emit the correct lua to bind functions
+  to the top level environment
+
+  So Codegen probably needs to take a list of IIR Bindings, equivalent to the Expr bindings
+
+  Lua has nested prototypes (right?) so need that structure here too I think
+-}
+

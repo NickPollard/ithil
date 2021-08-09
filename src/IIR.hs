@@ -68,11 +68,3 @@ data BinOp = Add | Mul | Sub -- TODO: add Div, Mod, Exp
 --   Call 'f' Var0 [Arg0, Arg0]
 --   Return Var0
 
-{-
-  IIR needs to have a notion of function bindings - I need to emit the correct lua to bind functions
-  to the top level environment
-
-  So Codegen probably needs to take a list of IIR Bindings, equivalent to the Expr bindings
-
-  Lua has nested prototypes (right?) so need that structure here too I think
--}

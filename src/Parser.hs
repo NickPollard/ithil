@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Parser (
-  parseModule
+  parseModule,
 ) where
 
 import Control.Applicative ((<|>), many, some)
