@@ -17,6 +17,7 @@ unitTests = testGroup "Parser" [ parserTest
                                , prefixOp
                                , associativity
                                , infixOp
+                               , lambda
                                ]
 
 parserTest :: TestTree
@@ -56,6 +57,24 @@ infixOp = testCase "An infix op" $ assertEqual "Failed to parse infix operator"
   }))
   (parse' "f = x + y")
 
+lambda :: TestTree
+lambda = testCase "A lambda" $ assertEqual "Failed to parse lambda expr"
+  (Right (Module {
+    moduleName = "<anonymous>",
+    moduleBindings = [Binding (Ident "f") (Lambda (Ident "a") (Lambda (Ident "b") (App (App (BuiltIn Add) (Var (Ident "a"))) (Var (Ident "b")))))
+  ]}))
+  (parse' "f = \\a -> \\b -> a + b")
+
+  {-
+matchArgs :: TestTree
+matchArgs = testCase "A function with match args" $ assertEqual "Failed to parse match args"
+  (Right (Module {
+    moduleName = "<anonymous>"
+    moduleBindings = [Binding (Ident "add") ()
+                     ]
+                 }))
+  (parse' "add a b = a + b")
+  -}
 
 -- TODO
 -- parens: (parse' "f = ((+) x y)")

@@ -108,6 +108,7 @@ compile (App fn arg) = do
   return var
 -- TODO - compile builtin (if I don't remove it)
 compile (BuiltIn _) = error "Builtins are currently unimplemented"
+compile (IfThenElse _ _ _) = error "IfThenElse is currently unimplemented"
 
 
 

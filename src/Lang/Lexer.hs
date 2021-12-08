@@ -99,7 +99,10 @@ reservedWords =
     "type",
     "data",
     "class",
-    "instance"
+    "instance",
+    "if",
+    "then",
+    "else"
   ]
 
 operator :: Parser Lexeme

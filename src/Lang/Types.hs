@@ -17,7 +17,12 @@ data Expr = Lambda Ident Expr
           | Var Ident
           | Lit Int
           | BuiltIn BinaryOp
+          | IfThenElse Expr Expr Expr
           deriving (Eq)
+
+-- | Syntax sugar available in the front-end language but not in Core
+data Sugar = Let Ident Expr Expr
+           | Where Ident Expr
 
 -- | A source code identifier
 -- Identifiers must begin with an alphabet or underscore character, and may contain alphanumeric
@@ -44,6 +49,7 @@ pretty' True  (Lambda (Ident v) b) = "(\\" <> v <> " -> " <> pretty' False b <> 
 pretty' False (Lambda (Ident v) b) = "\\" <> v <> " -> " <> pretty' False b
 pretty' _ (BuiltIn Add)        = "+"
 pretty' _ (BuiltIn Mul)        = "*"
+pretty' _ (IfThenElse if' then' else') = "if " <> pretty' False if' <> " then " <> pretty' False then' <> " else " <> pretty' False else'
 
 
 instance Show Expr where

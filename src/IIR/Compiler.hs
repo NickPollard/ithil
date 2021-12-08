@@ -123,6 +123,7 @@ compile' (Var varIdent) = do
   lookup' varIdent
 compile' (Lit int') = return . Const $ KInt int'
 compile' (BuiltIn op) = return . Prim $ primOp op
+compile' (IfThenElse _ _ _) = error "NYI" -- TODO handle if-then-else
 
 -- TODO declare as an iso?
 primOp :: Lang.BinaryOp -> PrimOp

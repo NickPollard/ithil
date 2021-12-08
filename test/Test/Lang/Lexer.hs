@@ -12,12 +12,12 @@ import Text.Megaparsec.Pos (Pos(..))
 import Lang.Lexer (lexMaybe, lex', Lexeme(..))
 
 unitTests :: TestTree
-unitTests = testGroup "Lexer" [
-  lexemeTest,
-  lineTest,
-  moduleTest,
-  invalidLexeme
-  ]
+unitTests = testGroup "Lexer" [ lexemeTest
+                              , lineTest
+                              , moduleTest
+                              , invalidLexeme
+                              , lambdaTest
+                              ]
 
 lexemeTest :: TestTree
 lexemeTest = testCase "an individual identifier" $ assertEqual "failed to lex identifier"
@@ -56,6 +56,23 @@ lineTest = testCase "a trivial function def" $ assertEqual "Failed to lex functi
   (Identifier "y")
   ])
   (lexMaybe "f x y=x+y")
+
+lambdaTest :: TestTree
+lambdaTest = testCase "a lambda def" $ assertEqual "Failed to lex lambda def correctly"
+  (Just [
+  (Identifier "f"),
+  (Operator "="),
+  (Operator "\\"),
+  (Identifier "a"),
+  (Operator "->"),
+  (Operator "\\"),
+  (Identifier "b"),
+  (Operator "->"),
+  (Identifier "a"),
+  (Operator "+"),
+  (Identifier "b")
+        ])
+  (lexMaybe "f = \\a -> \\b -> a + b")
 
 moduleTest :: TestTree
 moduleTest = testCase "module" $ assertEqual "Failed to lex module"

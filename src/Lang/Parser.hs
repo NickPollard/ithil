@@ -14,7 +14,7 @@ import Text.Megaparsec (try, label, token, single, many)
 import Text.Megaparsec.Char (char, digitChar, letterChar, space, space1)
 
 import Lang.Lexer (Lexeme(..), ppLexemes)
-import Lang.Types (Ident(..), Expr(..), BinaryOp(..))
+import Lang.Types (Ident(..), Expr(..), BinaryOp(..), Sugar(..))
 
 data ParserErr = ParserErr deriving (Ord, Eq, Show)
 
@@ -164,6 +164,18 @@ close :: Parser Lexeme
 close = single $ Operator ")"
 
 --
+-- Desugaring from front-end language to Core
+--
+
+desugar :: Sugar -> Expr
+-- let `var` = `value` in `expr`
+desugar (Let var value expr) = App (Lambda var expr) value
+-- where `var` = `expr`
+-- -- TODO - how to express `where`?
+--  Probably this is just a list of additional scoped-bindings to an expr
+desugar (Where var expr) = error "NYI"
+
+--
 -- Error Formatting
 --
 
@@ -193,4 +205,3 @@ highlightErr (Lexemes input) pos = ppLexemes input <> "\n" <> spaces <> "^"
 
 show' :: Show a => a -> Text
 show' = pack . show
-
