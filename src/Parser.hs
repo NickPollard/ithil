@@ -56,7 +56,6 @@ ident = label "identifier" $ token (is_ident) Set.empty
         is_ident _ = Nothing
 
 lambda :: Parser Expr
---lambda = Lambda <$> (char '\\' *> ident <* space <* (char '-' <* char '>' <* space)) <*> expr
 lambda = Lambda <$>
   (single (Tokenizer.Operator "\\") *> ident <* single (Tokenizer.Operator "->")) <*> expr
 

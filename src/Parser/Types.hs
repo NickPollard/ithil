@@ -15,6 +15,7 @@ import Text.Megaparsec (Stream(..))
 -- Parsing is two-stage:
 --   the first stage tokenizes from [char] -> Either [token] Error
 --   the second parses [token] -> AST
+--   TODO: s/lexon/lexeme
 data Lexon = Identifier Text
            | Reserved Text
            | Operator Text

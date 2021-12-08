@@ -8,6 +8,7 @@ data SVal = Reg Rx
           | Argument Arg
           | Const Constant
           | Prim PrimOp
+          -- | Upvalue ???
 
 -- Function Argument at a given index
 data Arg = Arg Int
@@ -29,6 +30,9 @@ data IIR =
   -- Create a closure from a given function template and closing over given upvalues, store result in Rx
   CLOSURE FnTemplate [SVal] Rx
   -- Call a given Closure with given arguments, store result in Rx
-  CALL SVal [SVal] Rx
+  -- TODO first arg should not be SVal - Or should it?
+  | CALL SVal [SVal] Rx
   -- Return from this function the given `SVal`
-  RETURN SVal
+  | RETURN SVal
+  -- Execute a primitive binary op, store results in `Rx`
+  | PRIM PrimOp SVal SVal Rx

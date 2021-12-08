@@ -8,12 +8,16 @@ module Lang.Types where
 
 import Data.Text (Text, pack, unpack)
 
+-- An error produced by the lexer
+data LexerError = LexerInvalidToken deriving (Eq, Ord, Show)
+
 -- | An AST Expression
 data Expr = Lambda Ident Expr
           | App Expr Expr
           | Var Ident
           | Lit Int
           | BuiltIn BinaryOp
+          deriving (Eq)
 
 -- | A source code identifier
 -- Identifiers must begin with an alphabet or underscore character, and may contain alphanumeric
@@ -24,21 +28,23 @@ newtype Ident = Ident Text
 -- | A builtin binary operation such as + or *
 data BinaryOp = Add
               | Mul
+              deriving (Eq, Show)
 
-{-
-     infix operators should probably just parse into standard app, e.g.
-        x + y
-     is just syntax sugar for
-        (+) x y
--}
-
+-- TODO better parens
+-- TODO test for this output!
 pretty :: Expr -> Text
-pretty (Lit i)              = pack $ show i
-pretty (Var (Ident i))      = i
-pretty (App a b)            = "(" <> pretty a <> ") (" <> pretty b <> ")"
-pretty (Lambda (Ident v) b) = "\\" <> v <> "-> (" <> pretty b <> ")"
-pretty (BuiltIn Add)        = "+"
-pretty (BuiltIn Mul)        = "*"
+pretty = pretty' False
+
+pretty' :: Bool -> Expr -> Text
+pretty' _ (Lit i)            = pack $ show i
+pretty' _ (Var (Ident i))    = i
+pretty' True  (App a b)      = "(" <> pretty' True a <> " " <> pretty' True b <> ")"
+pretty' False (App a b)      = pretty' True a <> " " <> pretty' True b
+pretty' True  (Lambda (Ident v) b) = "(\\" <> v <> " -> " <> pretty' False b <> ")"
+pretty' False (Lambda (Ident v) b) = "\\" <> v <> " -> " <> pretty' False b
+pretty' _ (BuiltIn Add)        = "+"
+pretty' _ (BuiltIn Mul)        = "*"
+
 
 instance Show Expr where
   show = unpack . pretty

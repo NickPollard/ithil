@@ -26,10 +26,25 @@ loadSrcFile _ = return "file contents"
 parse :: IO ()
 parse = do
   args <- execParser argParser
+  case args of
+    (Args _ _ True) -> runRepl
+    otherwise -> parseSource args
+
+runRepl :: IO ()
+runRepl = putStrLn "repl!"
+--TODO - use haskeline to impl repl here
+-- e.g. runInputT $ loop
+-- where loop = do
+--   minpt <- getInptLine "prompt>"
+--   output <- parse minput
+--   outputLine output >> loop
+
+parseSource :: Args -> IO ()
+parseSource args = do
   src <- case args of
-    (Args (Just file) _ ) -> loadSrcFile file
-    (Args Nothing (Just src)) -> return (pack src)
-    (Args Nothing Nothing) -> error "Must specify either -f or -s"
+    (Args (Just file) _ _) -> loadSrcFile file
+    (Args Nothing (Just src) _) -> return (pack src)
+    (Args Nothing Nothing _) -> error "Must specify either -f or -s"
   --let program = either (error . unpack) id $ parseIIR src
   case parseIIR src of
     Left err -> putStrLn $ unpack err
