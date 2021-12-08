@@ -23,6 +23,10 @@ data Expr = Lambda Ident Expr
 -- | Syntax sugar available in the front-end language but not in Core
 data Sugar = Let Ident Expr Expr
            | Where Ident Expr
+           | FnMatch [Ident] Expr
+
+data SgExpr = Sugared Sugar
+            | Core Expr
 
 -- | A source code identifier
 -- Identifiers must begin with an alphabet or underscore character, and may contain alphanumeric

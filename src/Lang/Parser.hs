@@ -4,6 +4,7 @@
 module Lang.Parser where
 
 import Control.Applicative ((<|>), some)
+import Control.Monad (void)
 import Data.Bifunctor (first)
 import Data.Foldable (toList)
 import qualified Data.Set as Set
@@ -31,15 +32,6 @@ type Parser = MP.Parsec ParserErr Lexemes
 data Binding a = Binding { bindingName :: Ident
                          , bindingValue :: a
                          } deriving (Eq, Show)
-
-{-
--- | An AST Expression
-data Expr = Lambda Ident Expr
-          | App Expr Expr
-          | Var Ident
-          | Lit Int
-          | BuiltIn BinaryOp
-          -}
 
 -- Each file we parse should produce a named module containing a list of bindings
 data Module = Module { moduleName :: String
@@ -132,6 +124,26 @@ lambda = Lambda <$>
     where slash' = single $ Operator "\\"
           arrow' = single $ Operator "->"
 
+fnMatch :: Parser Sugar
+fnMatch = FnMatch <$> some ident <* equals' <*> expr
+  -- TODO pull to top-level helper?
+  where equals' = single $ Operator "="
+
+binding' :: Parser (Binding Expr)
+binding' = Binding <$> ident <*> (desugar <$> fnMatch)
+
+binding'' :: Parser (Binding Sugar)
+binding'' = Binding <$> ident <*> fnMatch
+
+reserved :: Text -> Parser ()
+reserved = void . single . Reserved
+
+let' :: Parser Sugar
+let' = Let <$> (let'' *> ident) <*> (equals' *> expr) <*> (in' *> expr)
+  where let'' = reserved "let"
+        in' = reserved "in"
+        equals' = single $ Operator "="
+
 --app :: Parser Expr
 --app = App <$> fn <*> expr
   --where fn = var <|> parens expr
@@ -174,6 +186,9 @@ desugar (Let var value expr) = App (Lambda var expr) value
 -- -- TODO - how to express `where`?
 --  Probably this is just a list of additional scoped-bindings to an expr
 desugar (Where var expr) = error "NYI"
+--desugar (FnMatch [] expr) = expr
+-- TODO foldr'
+desugar (FnMatch (xs) expr) = foldr Lambda expr xs
 
 --
 -- Error Formatting

@@ -27,42 +27,27 @@ parserTest = testCase "Default Parser Test" $ assertEqual "Failed Default Parser
 
 trivialBinding :: TestTree
 trivialBinding = testCase "A trivial binding" $ assertEqual "Failed to parse trivial binding"
-  (Right (Module {
-    moduleName = "<anonymous>",
-    moduleBindings = [Binding (Ident "f") (App (Var (Ident "g_")) (Var (Ident "x")))]
-  }))
+  (anon' ["f" <=> (var "g_" `App` var "x")])
   (parse' "f = g_ x")
 
 prefixOp :: TestTree
 prefixOp = testCase "A prefix op" $ assertEqual "Failed to parse prefix operator"
-  (Right (Module {
-    moduleName = "<anonymous>",
-    moduleBindings = [Binding (Ident "f") (App (BuiltIn Add) (Var (Ident "x")))]
-  }))
+  (anon' ["f" <=> (BuiltIn Add `App` var "x")])
   (parse' "f = (+) x")
 
 associativity :: TestTree
 associativity = testCase "Associativity" $ assertEqual "Failed to parse trivial binding"
-  (Right (Module {
-    moduleName = "<anonymous>",
-    moduleBindings = [Binding (Ident "f") (App (App (BuiltIn Add) (Var (Ident "x"))) (Var (Ident "y")))]
-  }))
+  (anon' ["f" <=> (BuiltIn Add `App` var "x" `App` var "y")])
   (parse' "f = (+) x y")
 
 infixOp :: TestTree
 infixOp = testCase "An infix op" $ assertEqual "Failed to parse infix operator"
-  (Right (Module {
-    moduleName = "<anonymous>",
-    moduleBindings = [Binding (Ident "f") (App (App (BuiltIn Add) (Var (Ident "x"))) (Var (Ident "y")))]
-  }))
+  (anon' ["f" <=> ((BuiltIn Add) `App` (var "x") `App` (var "y"))])
   (parse' "f = x + y")
 
 lambda :: TestTree
 lambda = testCase "A lambda" $ assertEqual "Failed to parse lambda expr"
-  (Right (Module {
-    moduleName = "<anonymous>",
-    moduleBindings = [Binding (Ident "f") (Lambda (Ident "a") (Lambda (Ident "b") (App (App (BuiltIn Add) (Var (Ident "a"))) (Var (Ident "b")))))
-  ]}))
+  (anon' ["f" <=> Lambda (Ident "a") (Lambda (Ident "b") (App (App (BuiltIn Add) (Var (Ident "a"))) (Var (Ident "b"))))])
   (parse' "f = \\a -> \\b -> a + b")
 
   {-
@@ -75,6 +60,24 @@ matchArgs = testCase "A function with match args" $ assertEqual "Failed to parse
                  }))
   (parse' "add a b = a + b")
   -}
+
+--
+-- Shortcuts for easy definition of expected outputs
+--
+
+-- Shortcut for building an anonymous module result
+anon' :: [Binding Expr] -> Either err Module
+anon' bs = Right (Module {
+    moduleName = "<anonymous>",
+    moduleBindings = bs
+  })
+
+-- Shortcut for binding definition
+(<=>) :: Text -> a -> Binding a
+(<=>) id' expr' = Binding (Ident id') expr'
+
+var :: Text -> Expr
+var id' = Var (Ident id')
 
 -- TODO
 -- parens: (parse' "f = ((+) x y)")
