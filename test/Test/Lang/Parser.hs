@@ -68,7 +68,7 @@ matchArgs = testCase "A function with match args" $ assertEqual "Failed to parse
 -- Shortcut for building an anonymous module result
 anon' :: [Binding Expr] -> Either err Module
 anon' bs = Right (Module {
-    moduleName = MAnonymous
+    moduleName = MAnonymous,
     moduleBindings = bs
   })
 

@@ -10,7 +10,7 @@ import Options.Applicative (execParser)
 
 import Args (Args(..), argParser)
 import CodeGen (printCode, runCodegen)
-import qualified IIR
+--import qualified IIR
 import qualified Compiler
 import Parser (parseModule)
 import Parser.Tokenizer (tokenize)

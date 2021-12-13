@@ -20,7 +20,7 @@ import qualified Data.Map as Map
 import Data.Tuple.Extra ((&&&))
 
 import Compiler.Types
-import qualified IIR as IIR
+--import qualified IIR as IIR
 --import IIR (IIR)
 import Lang.Types (Binding, Expr(..))
 

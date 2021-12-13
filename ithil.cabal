@@ -6,9 +6,9 @@ homepage:            https://github.com/githubuser/ithil#readme
 license:             BSD3
 license-file:        LICENSE
 author:              Author name here
-maintainer:          example@example.com
-copyright:           2019 Author name here
-category:            Web
+maintainer:          nickedwardpollard@gmail.com
+copyright:           2021 Nick Pollard
+category:            Language
 build-type:          Simple
 extra-source-files:  README.md
 cabal-version:       >=1.10
@@ -18,10 +18,10 @@ library
   ghc-options:         -Wall -Werror=incomplete-patterns
   exposed-modules:     Lib,
                        Args,
-                       CodeGen,
-                       Compiler,
-                       Compiler.Types,
-                       IIR,
+                       --CodeGen,
+                       --Compiler,
+                       --Compiler.Types,
+                       --IIR,
                        IIR.Compiler,
                        IIR.Types,
 
@@ -29,12 +29,12 @@ library
                        Lang.Parser,
                        Lang.Types,
 
-                       Lua,
-                       Parser,
-                       Parser.Errors,
-                       Parser.Tokenizer,
-                       Parser.Types,
-                       Types
+                       Lua
+                       --Parser,
+                       --Parser.Errors,
+                       --Parser.Tokenizer,
+                       --Parser.Types,
+                       --Types
   build-depends:       base >= 4.7 && < 5,
                        binary,
                        bytestring,
