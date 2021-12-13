@@ -129,6 +129,8 @@ compile' (IfThenElse _ _ _) = error "NYI" -- TODO handle if-then-else
 primOp :: Lang.BinaryOp -> PrimOp
 primOp Lang.Add = ADD
 primOp Lang.Mul = MUL
+primOp Lang.Sub = error "sub NYI"
+primOp Lang.Div = error "div NYI"
 
 -- TODO - impl this, how does it deal with upvalues/closure creation?
 newLambda :: Ident -> Expr -> CompileM SVal

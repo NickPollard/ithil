@@ -8,7 +8,7 @@ import Test.Tasty
 import Test.Tasty.HUnit
 
 import Lang.Lexer (lexMaybe)
-import Lang.Parser (parseModule, Binding(..), Module(..), Lexemes(..))
+import Lang.Parser (parseModule, Binding(..), Module(..), Lexemes(..), ModuleName(..))
 import Lang.Types (Expr(..), BinaryOp(..), Ident(..))
 
 unitTests :: TestTree
@@ -68,7 +68,7 @@ matchArgs = testCase "A function with match args" $ assertEqual "Failed to parse
 -- Shortcut for building an anonymous module result
 anon' :: [Binding Expr] -> Either err Module
 anon' bs = Right (Module {
-    moduleName = "<anonymous>",
+    moduleName = MAnonymous
     moduleBindings = bs
   })
 

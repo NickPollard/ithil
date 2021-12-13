@@ -36,11 +36,11 @@ newtype Ident = Ident Text
 
 -- | A builtin binary operation such as + or *
 data BinaryOp = Add
+              | Sub
               | Mul
+              | Div
               deriving (Eq, Show)
 
--- TODO better parens
--- TODO test for this output!
 pretty :: Expr -> Text
 pretty = pretty' False
 
@@ -52,7 +52,9 @@ pretty' False (App a b)      = pretty' True a <> " " <> pretty' True b
 pretty' True  (Lambda (Ident v) b) = "(\\" <> v <> " -> " <> pretty' False b <> ")"
 pretty' False (Lambda (Ident v) b) = "\\" <> v <> " -> " <> pretty' False b
 pretty' _ (BuiltIn Add)        = "+"
+pretty' _ (BuiltIn Sub)        = "-"
 pretty' _ (BuiltIn Mul)        = "*"
+pretty' _ (BuiltIn Div)        = "/"
 pretty' _ (IfThenElse if' then' else') = "if " <> pretty' False if' <> " then " <> pretty' False then' <> " else " <> pretty' False else'
 
 

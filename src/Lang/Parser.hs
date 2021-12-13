@@ -33,8 +33,12 @@ data Binding a = Binding { bindingName :: Ident
                          , bindingValue :: a
                          } deriving (Eq, Show)
 
+data ModuleName = MAnonymous
+                | MNamed Text
+                deriving (Eq, Ord, Show)
+
 -- Each file we parse should produce a named module containing a list of bindings
-data Module = Module { moduleName :: String
+data Module = Module { moduleName :: ModuleName
                      , moduleBindings :: [Binding Expr]
                      }
                      deriving (Eq, Show)
@@ -80,17 +84,16 @@ module' :: Parser Module
 module' = Module <$> moduleName' <*> many binding
 
 -- A module name: 'module <NAME> where'
-moduleName' :: Parser String
-moduleName' = return "<anonymous>" -- TODO parse module names
+moduleName' :: Parser ModuleName
+-- TODO: Parse module name declaration
+moduleName' = return MAnonymous
 
 -- A top level binding
 --
 -- `f = expr`
 binding :: Parser (Binding Expr)
-binding = Binding <$> ident <* equals' <*> expr
-  where equals' = single $ Operator "="
+binding = Binding <$> ident <* op "=" <*> expr
 
--- TODO fix associativity, esp. wrt. App
 expr :: Parser Expr
 expr = try infix' <|> subterm
 
@@ -125,9 +128,7 @@ lambda = Lambda <$>
           arrow' = single $ Operator "->"
 
 fnMatch :: Parser Sugar
-fnMatch = FnMatch <$> some ident <* equals' <*> expr
-  -- TODO pull to top-level helper?
-  where equals' = single $ Operator "="
+fnMatch = FnMatch <$> some ident <* op "=" <*> expr
 
 binding' :: Parser (Binding Expr)
 binding' = Binding <$> ident <*> (desugar <$> fnMatch)
@@ -135,14 +136,16 @@ binding' = Binding <$> ident <*> (desugar <$> fnMatch)
 binding'' :: Parser (Binding Sugar)
 binding'' = Binding <$> ident <*> fnMatch
 
+op :: Text -> Parser ()
+op = void . single . Operator
+
 reserved :: Text -> Parser ()
 reserved = void . single . Reserved
 
 let' :: Parser Sugar
-let' = Let <$> (let'' *> ident) <*> (equals' *> expr) <*> (in' *> expr)
+let' = Let <$> (let'' *> ident) <*> (op "=" *> expr) <*> (in' *> expr)
   where let'' = reserved "let"
         in' = reserved "in"
-        equals' = single $ Operator "="
 
 --app :: Parser Expr
 --app = App <$> fn <*> expr
@@ -161,10 +164,11 @@ app' = go <$> fn <*> some operand
         operand = var <|> lit <|> parens expr
 
 builtin :: Parser Expr
-builtin = BuiltIn <$> (add' <|> mul')
+builtin = BuiltIn <$> (add' <|> mul' <|> div' <|> sub')
   where add' = Add <$ single (Operator "+")
         mul' = Mul <$ single (Operator "*")
-        -- TODO: add (Div, Sub) operators
+        div' = Div <$ single (Operator "/")
+        sub' = Sub <$ single (Operator "-")
 
 parens :: Parser a -> Parser a
 parens p = open *> p <* close
@@ -179,6 +183,7 @@ close = single $ Operator ")"
 -- Desugaring from front-end language to Core
 --
 
+-- TODO: Parse syntax-sugared expressions
 desugar :: Sugar -> Expr
 -- let `var` = `value` in `expr`
 desugar (Let var value expr) = App (Lambda var expr) value
@@ -187,7 +192,7 @@ desugar (Let var value expr) = App (Lambda var expr) value
 --  Probably this is just a list of additional scoped-bindings to an expr
 desugar (Where var expr) = error "NYI"
 --desugar (FnMatch [] expr) = expr
--- TODO foldr'
+-- TODO: replace with foldr' for better performance
 desugar (FnMatch (xs) expr) = foldr Lambda expr xs
 
 --

@@ -14,7 +14,7 @@ import qualified Text.Megaparsec as MP
 import Text.Megaparsec.Char (alphaNumChar, char, digitChar, letterChar, string, space1)
 import qualified Text.Megaparsec.Char.Lexer as L
 
--- TODO should LexerError just be defined in this file?
+-- TODO: should LexerError just be defined in this file?
 import Lang.Types (LexerError)
 
 -- Lexemes that can be tokenized from the raw stream of characters of a text source file
