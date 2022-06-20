@@ -7,7 +7,8 @@ import Data.Text (Text)
 data SVal = Reg Rx
           | Argument Arg
           | Const Constant
-          | Prim PrimOp
+          | Prin PrimOp
+          -- TODO: Upvalue
           -- | Upvalue ???
 
 -- Function Argument at a given index
@@ -25,7 +26,10 @@ data FnTemplate = FnTemplate Text
 data PrimOp
   = ADD
   | MUL
+  | SUB
+  | DIV
 
+-- Our Intermediate Imperative Representation (IIR) Expression type
 data IIR =
   -- Create a closure from a given function template and closing over given upvalues, store result in Rx
   CLOSURE FnTemplate [SVal] Rx
@@ -36,3 +40,10 @@ data IIR =
   | RETURN SVal
   -- Execute a primitive binary op, store results in `Rx`
   | PRIM PrimOp SVal SVal Rx
+
+
+-- What is an IIR program? Ignore on-disk fmt for a moment, but what - philosophically - are we storing?
+-- a Map FnName [Inst]?
+-- Then execution is a case of `lookup "MAIN" prog` to get main, then `exec main`.
+-- Then calling a function is a case of looking it up in the prog dictionary, and execing that fn
+data Prog = Prog { Map FnName Fn }

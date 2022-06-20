@@ -103,7 +103,7 @@ compile' (App (App (BuiltIn op) a) b) = do
 --     becomes
 --   \x -> ADD y x
 compile' (App (BuiltIn op) a) = do
-  -- compile a so it's ready to be closed over
+  -- compile `a` so it's ready to be closed over
   upvalue_a' <- compile' a
   -- Build a new function template and then create a closure over the upvalue
   -- TODO replace "$_1" with a guaranteed unique local var

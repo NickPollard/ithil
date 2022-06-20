@@ -190,10 +190,10 @@ desugar (Let var value expr) = App (Lambda var expr) value
 -- where `var` = `expr`
 -- -- TODO - how to express `where`?
 --  Probably this is just a list of additional scoped-bindings to an expr
-desugar (Where var expr) = error "NYI"
+desugar (Where var expr') = error "NYI"
 --desugar (FnMatch [] expr) = expr
 -- TODO: replace with foldr' for better performance
-desugar (FnMatch (xs) expr) = foldr Lambda expr xs
+desugar (FnMatch (xs) expr') = foldr Lambda expr' xs
 
 --
 -- Error Formatting

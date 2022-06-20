@@ -19,10 +19,9 @@ library
   exposed-modules:     Lib,
                        Args,
                        --CodeGen,
-                       --Compiler,
-                       --Compiler.Types,
-                       --IIR,
+
                        IIR.Compiler,
+                       IIR.Interpreter,
                        IIR.Types,
 
                        Lang.Lexer,
